@@ -1,10 +1,15 @@
 package distributed_systems.lab2.homework;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import javax.validation.Valid;
 
 @Controller
 public class InputController {
@@ -16,8 +21,8 @@ public class InputController {
     }
 
     @PostMapping("/input")
-    public String inputSubmit(@ModelAttribute Input input) {
-        return "result";
+    public ResponseEntity<Input> inputSubmit(@Valid @RequestBody @ModelAttribute Input input) {
+        return new ResponseEntity<>(input, HttpStatus.OK);
     }
 
 }

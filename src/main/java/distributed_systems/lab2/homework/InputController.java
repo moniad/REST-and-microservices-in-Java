@@ -33,18 +33,20 @@ public class InputController {
         parameters.put("param1", input.getContent());
 
         String basicUrl = "https://date.nager.at/api/v2/PublicHolidays";
-        URL url = new URL(basicUrl.concat(ParameterStringBuilder.getParametersString(parameters)));
 
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        HttpURLConnection connection = getURLConnection(basicUrl.concat(ParameterStringBuilder.getParametersString(parameters)));
 
-        // prepare connection
-        connection.setRequestMethod("GET");
-        connection.setDoOutput(true); // to add params to request
-        connection.setRequestProperty("Content-Type", "application/json");
-        connection.setConnectTimeout(5000); // 5 sec
-        connection.setReadTimeout(5000);
+        Map<String, String> headers = initHeaders();
+        setHeaders(connection, headers);
 
-        // read the response code
+        String response = getResponse(connection);
+
+        connection.disconnect();
+
+        return new ResponseEntity<>(new Input(response), HttpStatus.OK);
+    }
+
+    private static String getResponse(HttpURLConnection connection) throws IOException {
         System.out.println("STATUS: " + connection.getResponseCode());
 
         BufferedReader in;
@@ -53,7 +55,7 @@ public class InputController {
         if (connection.getResponseCode() > 299) {
             in = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
             System.out.println("ERROR reading stream: " + in.toString());
-            return new ResponseEntity<>(new Input(":("), HttpStatus.NOT_ACCEPTABLE);
+            throw new IOException();
         } else {
             in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String inputLine;
@@ -63,9 +65,35 @@ public class InputController {
             in.close();
 
             System.out.println("SUCCESS reading stream: " + content.toString());
+            return content.toString();
         }
-        connection.disconnect();
+    }
 
-        return new ResponseEntity<>(new Input(content.toString()), HttpStatus.OK);
+
+    private static HttpURLConnection getURLConnection(String urlToConnect) throws IOException {
+        URL url = new URL(urlToConnect);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        // prepare connection
+        connection.setRequestMethod("GET");
+        connection.setDoOutput(true); // to add params to request
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setConnectTimeout(5000); // 5 sec
+        connection.setReadTimeout(5000);
+
+        return connection;
+    }
+
+    private static Map<String, String> initHeaders() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("X-CSRF-Token", "fetch");
+        headers.put("content-type", "application/json");
+        return headers;
+    }
+
+    private static void setHeaders(HttpURLConnection connection, Map<String, String> headers) {
+        for (String headerKey : headers.keySet()) {
+            connection.setRequestProperty(headerKey, headers.get(headerKey));
+        }
     }
 }

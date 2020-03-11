@@ -1,5 +1,10 @@
-package distributed_systems.lab2.homework;
+package distributed_systems.lab2.homework.controller;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import distributed_systems.lab2.homework.Input;
+import distributed_systems.lab2.homework.Output;
+import distributed_systems.lab2.homework.util.ParameterStringBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -28,22 +33,30 @@ public class InputController {
     }
 
     @PostMapping("/input")
-    public ResponseEntity<Input> inputSubmit(@Valid @RequestBody @ModelAttribute Input input) throws IOException {
+    public ResponseEntity<Output> inputSubmit(@Valid @RequestBody @ModelAttribute Input input) throws IOException {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("param1", input.getContent());
 
-        String basicUrl = "https://date.nager.at/api/v2/PublicHolidays";
+        String basicUrl = "https://wordsapiv1.p.rapidapi.com/words";
 
-        HttpURLConnection connection = getURLConnection(basicUrl.concat(ParameterStringBuilder.getParametersString(parameters)));
+        HttpURLConnection connection = getURLConnection(basicUrl.concat(
+                ParameterStringBuilder.getParametersString(parameters))
+                .concat("/definitions"));
 
         Map<String, String> headers = initHeaders();
         setHeaders(connection, headers);
 
         String response = getResponse(connection);
 
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        Output resultOutput = mapper.readValue(response, Output.class);
+
+        System.out.println("RESULT OUTPUT:  " + resultOutput);
+
         connection.disconnect();
 
-        return new ResponseEntity<>(new Input(response), HttpStatus.OK);
+        return new ResponseEntity<>(resultOutput, HttpStatus.OK);
     }
 
     private static String getResponse(HttpURLConnection connection) throws IOException {
@@ -86,8 +99,10 @@ public class InputController {
 
     private static Map<String, String> initHeaders() {
         Map<String, String> headers = new HashMap<>();
-        headers.put("X-CSRF-Token", "fetch");
-        headers.put("content-type", "application/json");
+
+        headers.put("x-rapidapi-host", "wordsapiv1.p.rapidapi.com");
+        headers.put("x-rapidapi-key", "e60a7a24b3msh2abb848f9905257p161d9fjsna298c17d265e");
+
         return headers;
     }
 

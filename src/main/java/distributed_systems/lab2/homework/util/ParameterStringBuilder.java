@@ -1,4 +1,4 @@
-package distributed_systems.lab2.homework;
+package distributed_systems.lab2.homework.util;
 
 import java.util.Map;
 

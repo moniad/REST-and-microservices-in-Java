@@ -1,9 +1,13 @@
 package distributed_systems.lab2.homework.controller;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import distributed_systems.lab2.homework.Input;
 import distributed_systems.lab2.homework.Output;
+import distributed_systems.lab2.homework.Quote;
+import distributed_systems.lab2.homework.SingleEntryOutput;
 import distributed_systems.lab2.homework.util.ParameterStringBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,11 +24,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class InputController {
+    private static ObjectMapper mapper = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
     @GetMapping("/input")
     public String inputForm(Model model) {
@@ -34,29 +39,82 @@ public class InputController {
 
     @PostMapping("/input")
     public ResponseEntity<Output> inputSubmit(@Valid @RequestBody @ModelAttribute Input input) throws IOException {
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("param1", input.getContent());
+        String searchWord = input.getSearchWord();
 
+        Quote randomQuote = mapper.readValue(getRandomQuoteContainingWord(searchWord), Quote.class);
+        List<SingleEntryOutput> singleEntryOutputs = getDefinitionsForEachWordInQuote(searchWord, randomQuote);
+
+        Output output = Output.builder()
+                .quote(randomQuote)
+                .searchWord(searchWord)
+                .quoteWords(singleEntryOutputs)
+                .build();
+
+        return new ResponseEntity<>(output, HttpStatus.OK);
+    }
+
+    private static List<SingleEntryOutput> getDefinitionsForEachWordInQuote(String searchWord, Quote quote) throws IOException {
         String basicUrl = "https://wordsapiv1.p.rapidapi.com/words";
+        List<SingleEntryOutput> singleEntryOutputs = new ArrayList<>();
 
-        HttpURLConnection connection = getURLConnection(basicUrl.concat(
-                ParameterStringBuilder.getParametersString(parameters))
-                .concat("/definitions"));
+        Map<String, String> parameters = new HashMap<>();
 
-        Map<String, String> headers = initHeaders();
-        setHeaders(connection, headers);
 
+        List<String> words = Arrays.asList(quote.getQuote().split(" ,.-;")); // todo: i want to split a quote into a list of words
+        System.out.println("WORDS: " + words.toString());
+
+        for (String word : words) {
+            parameters.put("param1", word);
+
+            HttpURLConnection connection = getURLConnection(basicUrl.concat(
+                    ParameterStringBuilder.getParametersString(parameters))
+                    .concat("/definitions"));
+
+            Map<String, String> headers = initHeaders();
+            setHeaders(connection, headers);
+
+            String response = getResponse(connection);
+
+            SingleEntryOutput result = mapper.readValue(response, SingleEntryOutput.class);
+
+            System.out.println("RESULT OUTPUT:  " + result);
+
+            singleEntryOutputs.add(result);
+
+            connection.disconnect();
+            parameters.remove("param1");
+
+        }
+
+        return singleEntryOutputs;
+    }
+
+    public static List<Quote> convertJsonToArrayList(String response) throws JsonParseException, JsonMappingException,
+            IOException {
+
+        List<Quote> quotes = mapper.readValue(
+                response,
+                mapper.getTypeFactory().constructCollectionType(
+                        List.class, Quote.class));
+
+        System.out.println("QUOTES: + " + quotes.toString());
+        return quotes;
+    }
+
+    public static String getRandomQuoteContainingWord(String searchWord) throws IOException {
+        String url = "http://programming-quotes-api.herokuapp.com/quotes/lang/en/";
+        HttpURLConnection connection = getURLConnection(url);
         String response = getResponse(connection);
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        Output resultOutput = mapper.readValue(response, Output.class);
-
-        System.out.println("RESULT OUTPUT:  " + resultOutput);
+        List<Quote> quotes = convertJsonToArrayList(response).stream()
+                .filter(q -> q.getQuote().contains(searchWord)).collect(Collectors.toList());
 
         connection.disconnect();
 
-        return new ResponseEntity<>(resultOutput, HttpStatus.OK);
+        Random random = new Random();
+        int randomIndex = random.nextInt(quotes.size());
+
+        return quotes.get(randomIndex).toString();
     }
 
     private static String getResponse(HttpURLConnection connection) throws IOException {
@@ -81,7 +139,6 @@ public class InputController {
             return content.toString();
         }
     }
-
 
     private static HttpURLConnection getURLConnection(String urlToConnect) throws IOException {
         URL url = new URL(urlToConnect);

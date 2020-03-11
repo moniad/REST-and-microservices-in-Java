@@ -1,18 +1,16 @@
 package distributed_systems.lab2.homework;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Getter
-@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Output {
-    private String word;
-    private List<Definition> definitions;
-
-    @Override
-    public String toString() {
-        return "word: " + word + ", defs: " + definitions.toString();
-    }
+    private String searchWord;
+    private Quote quote;
+    private List<SingleEntryOutput> quoteWords;
 }

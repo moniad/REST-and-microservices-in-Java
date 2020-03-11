@@ -7,10 +7,9 @@ import lombok.Setter;
 @Setter
 public class Definition {
     private String definition;
-    private String partOfSpeech;
 
     @Override
     public String toString() {
-        return "def: " + definition + " pOS: " + partOfSpeech;
+        return "def: " + definition;
     }
 }

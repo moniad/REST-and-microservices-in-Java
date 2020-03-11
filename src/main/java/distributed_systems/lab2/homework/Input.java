@@ -13,5 +13,5 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class Input {
     @NotNull
-    private String content;
+    private String searchWord;
 }

@@ -6,7 +6,12 @@
 </head>
 <body>
 <h1>Result</h1>
-<p th:text="'Typed word: ' + ${input.content}"></p>
+<p th:text="'Typed word: ' + ${output.getSearchWord()}"></p>
+<p th:text="'Quote: ' + ${output.getQuote()}"></p>
+<tr th:each="word: ${output.getQuoteWords()}">
+    <td th:text="${word.getWord()}"></td>
+    <td th:text="${word.getDefinitions()}"></td>
+</tr>
 <a href="/input">Submit another message</a>
 </body>
 </html>

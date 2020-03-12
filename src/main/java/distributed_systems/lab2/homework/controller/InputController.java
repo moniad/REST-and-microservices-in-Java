@@ -38,7 +38,7 @@ public class InputController {
     }
 
     @PostMapping("/input")
-    public ResponseEntity<Output> inputSubmit(@Valid @RequestBody @ModelAttribute Input input) throws IOException {
+    public String inputSubmit(@Valid @RequestBody @ModelAttribute Input input, Model model) throws IOException {
         String searchWord = input.getSearchWord();
 
         Quote randomQuote = getRandomQuoteContainingWord(searchWord);
@@ -49,9 +49,10 @@ public class InputController {
                 .searchWord(searchWord)
                 .quoteWords(singleEntryOutputs)
                 .build();
-// todo: write output converter
 
-        return new ResponseEntity<>(output, HttpStatus.OK);
+        model.addAttribute("output", output);
+
+        return "result";
     }
 
     // todo: use searchWord

@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"name": "Translate",
+			"name": "Output",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -21,8 +21,8 @@
 					"mode": "formdata",
 					"formdata": [
 						{
-							"key": "content",
-							"value": "elo",
+							"key": "searchWord",
+							"value": "amazing",
 							"type": "text"
 						}
 					],
@@ -36,6 +36,82 @@
 					"raw": "{{url}}",
 					"host": [
 						"{{url}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "English quotes",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{quotes_url}}",
+					"host": [
+						"{{quotes_url}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Example definition of 'amazing' ",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "x-rapidapi-host",
+						"value": "wordsapiv1.p.rapidapi.com",
+						"type": "text"
+					},
+					{
+						"key": "x-rapidapi-key",
+						"value": "e60a7a24b3msh2abb848f9905257p161d9fjsna298c17d265e",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{amazing_definition_url}}",
+					"host": [
+						"{{amazing_definition_url}}"
 					]
 				}
 			},

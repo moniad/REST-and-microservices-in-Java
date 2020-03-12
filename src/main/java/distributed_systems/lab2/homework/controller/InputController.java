@@ -41,7 +41,7 @@ public class InputController {
     public ResponseEntity<Output> inputSubmit(@Valid @RequestBody @ModelAttribute Input input) throws IOException {
         String searchWord = input.getSearchWord();
 
-        Quote randomQuote = mapper.readValue(getRandomQuoteContainingWord(searchWord), Quote.class);
+        Quote randomQuote = getRandomQuoteContainingWord(searchWord);
         List<SingleEntryOutput> singleEntryOutputs = getDefinitionsForEachWordInQuote(searchWord, randomQuote);
 
         Output output = Output.builder()
@@ -49,10 +49,12 @@ public class InputController {
                 .searchWord(searchWord)
                 .quoteWords(singleEntryOutputs)
                 .build();
+// todo: write output converter
 
         return new ResponseEntity<>(output, HttpStatus.OK);
     }
 
+    // todo: use searchWord
     private static List<SingleEntryOutput> getDefinitionsForEachWordInQuote(String searchWord, Quote quote) throws IOException {
         String basicUrl = "https://wordsapiv1.p.rapidapi.com/words";
         List<SingleEntryOutput> singleEntryOutputs = new ArrayList<>();
@@ -60,7 +62,8 @@ public class InputController {
         Map<String, String> parameters = new HashMap<>();
 
 
-        List<String> words = Arrays.asList(quote.getQuote().split(" ,.-;")); // todo: i want to split a quote into a list of words
+        //splitting a quote into a list of words
+        List<String> words = Arrays.stream(quote.getQuote().split("\\W+")).distinct().collect(Collectors.toList());
         System.out.println("WORDS: " + words.toString());
 
         for (String word : words) {
@@ -75,15 +78,14 @@ public class InputController {
 
             String response = getResponse(connection);
 
-            SingleEntryOutput result = mapper.readValue(response, SingleEntryOutput.class);
-
-            System.out.println("RESULT OUTPUT:  " + result);
-
-            singleEntryOutputs.add(result);
+            if (response != null) {
+                SingleEntryOutput result = mapper.readValue(response, SingleEntryOutput.class);
+                System.out.println("RESULT OUTPUT:  " + result);
+                singleEntryOutputs.add(result);
+            }
 
             connection.disconnect();
             parameters.remove("param1");
-
         }
 
         return singleEntryOutputs;
@@ -101,7 +103,7 @@ public class InputController {
         return quotes;
     }
 
-    public static String getRandomQuoteContainingWord(String searchWord) throws IOException {
+    public static Quote getRandomQuoteContainingWord(String searchWord) throws IOException {
         String url = "http://programming-quotes-api.herokuapp.com/quotes/lang/en/";
         HttpURLConnection connection = getURLConnection(url);
         String response = getResponse(connection);
@@ -114,7 +116,7 @@ public class InputController {
         Random random = new Random();
         int randomIndex = random.nextInt(quotes.size());
 
-        return quotes.get(randomIndex).toString();
+        return quotes.get(randomIndex);
     }
 
     private static String getResponse(HttpURLConnection connection) throws IOException {
@@ -125,8 +127,8 @@ public class InputController {
 
         if (connection.getResponseCode() > 299) {
             in = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
-            System.out.println("ERROR reading stream: " + in.toString());
-            throw new IOException();
+            System.out.println("ERROR reading stream: " + in.toString() + ". Word probably not found");
+            return null;
         } else {
             in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String inputLine;
@@ -148,8 +150,8 @@ public class InputController {
         connection.setRequestMethod("GET");
         connection.setDoOutput(true); // to add params to request
         connection.setRequestProperty("Content-Type", "application/json");
-        connection.setConnectTimeout(5000); // 5 sec
-        connection.setReadTimeout(5000);
+        connection.setConnectTimeout(30000); // 30 sec
+        connection.setReadTimeout(30000);
 
         return connection;
     }

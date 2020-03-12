@@ -9,8 +9,6 @@ import distributed_systems.lab2.homework.Output;
 import distributed_systems.lab2.homework.Quote;
 import distributed_systems.lab2.homework.SingleEntryOutput;
 import distributed_systems.lab2.homework.util.ParameterStringBuilder;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -62,9 +60,10 @@ public class InputController {
 
         Map<String, String> parameters = new HashMap<>();
 
-
         //splitting a quote into a list of words
-        List<String> words = Arrays.stream(quote.getQuote().split("\\W+")).distinct().collect(Collectors.toList());
+        SortedSet<String> words = Arrays.stream(quote.getQuote().split("\\W+"))
+                .map(String::toLowerCase).collect(Collectors.toCollection(TreeSet::new));
+
         System.out.println("WORDS: " + words.toString());
 
         for (String word : words) {

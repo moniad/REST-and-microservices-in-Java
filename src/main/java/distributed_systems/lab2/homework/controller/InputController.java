@@ -36,11 +36,19 @@ public class InputController {
     }
 
     @PostMapping("/input")
-    public String inputSubmit(@Valid @RequestBody @ModelAttribute Input input, Model model) throws IOException {
+    public String inputSubmit(@Valid @RequestBody @ModelAttribute Input input, Model model) {
         String searchWord = input.getSearchWord();
 
-        Quote randomQuote = getRandomQuoteContainingWord(searchWord);
-        List<SingleEntryOutput> singleEntryOutputs = getDefinitionsForEachWordInQuote(searchWord, randomQuote);
+        Quote randomQuote;
+        List<SingleEntryOutput> singleEntryOutputs;
+        try {
+            randomQuote = getRandomQuoteContainingWord(searchWord);
+            singleEntryOutputs = getDefinitionsForEachWordInQuote(randomQuote);
+        } catch (Exception e) {
+            System.out.println("ERROR MESSAGE: " + e.getMessage());
+            model.addAttribute("errorMessage", e.getMessage());
+            return "error";
+        }
 
         Output output = Output.builder()
                 .quote(randomQuote)
@@ -53,8 +61,7 @@ public class InputController {
         return "result";
     }
 
-    // todo: use searchWord
-    private static List<SingleEntryOutput> getDefinitionsForEachWordInQuote(String searchWord, Quote quote) throws IOException {
+    private static List<SingleEntryOutput> getDefinitionsForEachWordInQuote(Quote quote) throws IOException {
         String basicUrl = "https://wordsapiv1.p.rapidapi.com/words";
         List<SingleEntryOutput> singleEntryOutputs = new ArrayList<>();
 
@@ -103,7 +110,7 @@ public class InputController {
         return quotes;
     }
 
-    public static Quote getRandomQuoteContainingWord(String searchWord) throws IOException {
+    public static Quote getRandomQuoteContainingWord(String searchWord) throws IOException, IllegalArgumentException {
         String url = "http://programming-quotes-api.herokuapp.com/quotes/lang/en/";
         HttpURLConnection connection = getURLConnection(url);
         String response = getResponse(connection);

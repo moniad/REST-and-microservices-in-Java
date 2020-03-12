@@ -6,9 +6,12 @@
 </head>
 <body>
 <h1>Result</h1>
-<h3 th:text="'Typed word: ' + ${output.getSearchWord()}"></h3>
+<h3 th:text="'Typed word: '"></h3>
+<p th:text="${output.getSearchWord()}"></p>
 <h3 th:text="'Quote containing typed word: '"></h3>
-<p th:text="${output.getQuote()}"></p>
+<p th:text="${output.getQuote().getQuote()}"></p>
+<h3 th:text="'Author: '"></h3>
+<p th:text="${output.getQuote().getAuthor()}"></p>
 <br/>
 <p th:text="'Definitions of each word in the quote above:'"></p>
 <tr th:each="word: ${output.getQuoteWords()}">

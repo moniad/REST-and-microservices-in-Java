@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" lang="en">
+<head>
+    <title>Error template</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+
+<body>
+<h1>Error occurred :(</h1>
+<h3 th:text="'Error message: ' + ${errorMessage}"></h3>
+</body>
+</html>

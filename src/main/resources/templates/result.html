@@ -1,16 +1,20 @@
 <!DOCTYPE HTML>
 <html xmlns:th="https://www.thymeleaf.org">
 <head>
-    <title>Getting Started: Handling Form Submission</title>
+    <title>REST-homework</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 </head>
 <body>
 <h1>Result</h1>
-<p th:text="'Typed word: ' + ${output.getSearchWord()}"></p>
-<p th:text="'Quote: ' + ${output.getQuote()}"></p>
+<h3 th:text="'Typed word: ' + ${output.getSearchWord()}"></h3>
+<h3 th:text="'Quote containing typed word: '"></h3>
+<p th:text="${output.getQuote()}"></p>
+<br/>
+<p th:text="'Definitions of each word in the quote above:'"></p>
 <tr th:each="word: ${output.getQuoteWords()}">
-    <td th:text="${word.getWord()}"></td>
+    <td th:text="'- ' + ${word.getWord()}"></td>
     <td th:text="${word.getDefinitions()}"></td>
+    <br/>
 </tr>
 <p>
     <a href="/input">Submit another message</a>

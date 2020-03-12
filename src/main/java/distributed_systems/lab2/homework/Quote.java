@@ -13,6 +13,6 @@ public class Quote {
 
     @Override
     public String toString() {
-        return "Quote [quote = " + quote + ", author = " + author + "]";
+        return quote + ", author: " + author;
     }
 }

@@ -1,8 +1,6 @@
 package distributed_systems.lab2.homework.controller;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import distributed_systems.lab2.homework.Input;
 import distributed_systems.lab2.homework.Output;
@@ -98,8 +96,7 @@ public class InputController {
         return singleEntryOutputs;
     }
 
-    public static List<Quote> convertJsonToArrayList(String response) throws JsonParseException, JsonMappingException,
-            IOException {
+    public static List<Quote> convertJsonToArrayList(String response) throws IOException {
 
         List<Quote> quotes = mapper.readValue(
                 response,

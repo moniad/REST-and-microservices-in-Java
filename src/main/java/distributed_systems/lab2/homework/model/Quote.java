@@ -1,4 +1,4 @@
-package distributed_systems.lab2.homework;
+package distributed_systems.lab2.homework.model;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package distributed_systems.lab2.homework;
+package distributed_systems.lab2.homework.model;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -2,10 +2,10 @@ package distributed_systems.lab2.homework.controller;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import distributed_systems.lab2.homework.Input;
-import distributed_systems.lab2.homework.Output;
-import distributed_systems.lab2.homework.Quote;
-import distributed_systems.lab2.homework.SingleEntryOutput;
+import distributed_systems.lab2.homework.model.Input;
+import distributed_systems.lab2.homework.model.Output;
+import distributed_systems.lab2.homework.model.Quote;
+import distributed_systems.lab2.homework.model.SingleEntryOutput;
 import distributed_systems.lab2.homework.util.ParameterStringBuilder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

@@ -3,6 +3,7 @@
 Simple REST app communicating with Words API (https://www.wordsapi.com/) to get one random quote containing a specific word sent via provided form. All words in this specific words are translated via Words API as well.
 There are available some postman requests as well, so feel free to test this app :)
 This wasn't supposed to be a piece of art. Its sole purpose was to handle REST requests.
+Uses Thymeleaf.
 
 ## How to run
 * Open IDE you like and run RestApplication.java

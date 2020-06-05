@@ -1,4 +1,4 @@
-# REST-in-Java-Spring
+# REST-with-Spring-Boot
 ## Description
 Simple REST app communicating with Words API (https://www.wordsapi.com/) to get one random quote containing a specific word sent via provided form. All words in this specific words are translated via Words API as well.
 There are available some postman requests as well, so feel free to test this app :)
